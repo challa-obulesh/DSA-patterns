@@ -9,30 +9,35 @@ Medium
 ## Pattern
 Sorting + Two Pointers + Duplicate Handling
 
-## Key Idea
+## Optimal Approach
+
+The brute-force approach checks every triplet and takes `O(n^3)` time.
+
+The optimal standard approach is:
 
 ```text
-Sort the array
-    ↓
-Fix one number nums[i]
-    ↓
-Use left and right pointers
-    ↓
-Find nums[i] + nums[left] + nums[right] == 0
-    ↓
+Sort
+ ↓
+Fix one element
+ ↓
+Use Two Pointers for the remaining elements
+ ↓
 Skip duplicates
 ```
+
+This reduces the time complexity to `O(n^2)`.
 
 ## Pointer Rules
 
 ```text
-sum == 0 → save triplet and move both pointers
+sum == 0 → save triplet, move both pointers, skip duplicates
 sum < 0  → left++ to get a bigger sum
 sum > 0  → right-- to get a smaller sum
 ```
 
 ## Avoiding Duplicates
-Skip duplicate fixed values:
+
+Skip duplicate fixed elements:
 
 ```java
 if (i > 0 && nums[i] == nums[i - 1]) {
@@ -40,7 +45,7 @@ if (i > 0 && nums[i] == nums[i - 1]) {
 }
 ```
 
-After finding a triplet, move both pointers and skip duplicate left and right values.
+After finding a valid triplet, move both pointers and skip duplicate values.
 
 ## Example
 
@@ -63,8 +68,13 @@ Valid triplets:
 
 ## Complexity
 
+```text
+Brute Force → O(n^3) ❌
+Optimal     → O(n^2) ✅
+```
+
 - Time: `O(n²)`
-- Extra Space: `O(1)` excluding output
+- Extra Space: `O(1)` excluding output and sorting implementation details
 
 ## What to Remember
 
@@ -73,9 +83,12 @@ Valid triplets:
  ↓
 SORT
  ↓
-Fix one element
+Fix nums[i]
  ↓
-Two Pointers on remaining elements
+left = i + 1
+right = last index
  ↓
-Skip duplicates
+sum < 0 → left++
+sum > 0 → right--
+sum == 0 → save + skip duplicates
 ```
