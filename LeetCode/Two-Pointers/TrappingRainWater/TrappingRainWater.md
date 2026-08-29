@@ -7,17 +7,34 @@ LeetCode
 Hard
 
 ## Pattern
-Two Pointers + Left Maximum + Right Maximum
+Two Pointers
 
 ## Main Idea
 
-Water trapped at a position is:
+Think of the array as walls. Water at an index depends on the tallest wall on the left and the tallest wall on the right.
 
 ```text
-min(leftMax, rightMax) - currentHeight
+water = min(leftMax, rightMax) - currentHeight
 ```
 
-The optimal solution uses two pointers and processes the side with the smaller current height.
+Water can only rise up to the shorter boundary because both sides are needed to hold the water.
+
+Example:
+
+```text
+height = [4,2,0,3,2,5]
+```
+
+At index `2`:
+
+```text
+leftMax  = 4
+rightMax = 5
+current  = 0
+
+water = min(4,5) - 0
+      = 4
+```
 
 ## Optimal Java Solution
 
@@ -55,24 +72,66 @@ class Solution {
 
 ## Variables
 
-- `left` → starts from index `0`
-- `right` → starts from the last index
-- `leftMax` → tallest wall seen from the left
-- `rightMax` → tallest wall seen from the right
-- `water` → total trapped water
+- `left` → pointer starting at index `0`
+- `right` → pointer starting at the last index
+- `leftMax` → tallest wall found from the left
+- `rightMax` → tallest wall found from the right
+- `water` → total amount of trapped water
+
+## How the Two Pointers Work
+
+Start with both ends:
+
+```text
+height = [4,2,0,3,2,5]
+          ↑         ↑
+         left      right
+```
+
+Compare the two current heights.
+
+```text
+height[left] < height[right]
+```
+
+If the left height is smaller, process the left side. The right side already has a boundary at least as high as the current left height, so `leftMax` is enough to determine the water for that position.
+
+Otherwise, process the right side using `rightMax`.
 
 ## Dry Run
+
+Input:
 
 ```text
 height = [4,2,0,3,2,5]
 ```
 
+Initial:
+
+```text
+left = 0
+right = 5
+leftMax = 0
+rightMax = 0
+water = 0
+```
+
 ### Step 1
 
 ```text
-left = 0, right = 5
-heights = 4 and 5
-4 < 5 → process left
+left height = 4
+right height = 5
+```
+
+Since `4 < 5`, process left.
+
+```text
+4 >= leftMax(0)
+```
+
+So:
+
+```text
 leftMax = 4
 water = 0
 left++
@@ -81,11 +140,24 @@ left++
 ### Step 2
 
 ```text
-left = 1, right = 5
-height[left] = 2
-leftMax = 4
+left height = 2
+right height = 5
+```
 
-water += 4 - 2 = 2
+Since `2 < 5`, process left.
+
+```text
+leftMax = 4
+current = 2
+```
+
+Water:
+
+```text
+4 - 2 = 2
+```
+
+```text
 water = 2
 left++
 ```
@@ -93,10 +165,14 @@ left++
 ### Step 3
 
 ```text
-left = 2, right = 5
-height[left] = 0
+left height = 0
+right height = 5
+```
 
-water += 4 - 0 = 4
+Process left.
+
+```text
+water += 4 - 0
 water = 6
 left++
 ```
@@ -104,10 +180,14 @@ left++
 ### Step 4
 
 ```text
-left = 3, right = 5
-height[left] = 3
+left height = 3
+right height = 5
+```
 
-water += 4 - 3 = 1
+Process left.
+
+```text
+water += 4 - 3
 water = 7
 left++
 ```
@@ -115,12 +195,18 @@ left++
 ### Step 5
 
 ```text
-left = 4, right = 5
-height[left] = 2
+left height = 2
+right height = 5
+```
 
-water += 4 - 2 = 2
+Process left.
+
+```text
+water += 4 - 2
 water = 9
 ```
+
+Now the pointers meet, so the loop stops.
 
 ## Final Answer
 
@@ -128,11 +214,56 @@ water = 9
 9
 ```
 
-## Why Process the Smaller Side?
+The trapped water at the individual positions is:
 
-If `height[left] < height[right]`, the right side is guaranteed to have a boundary at least as high as the current left height. Therefore, the trapped water on the left can be determined using `leftMax`.
+```text
+index:  0 1 2 3 4 5
+water: [0,2,4,1,2,0]
+```
 
-If the right height is smaller or equal, process the right side using `rightMax`.
+Total:
+
+```text
+2 + 4 + 1 + 2 = 9
+```
+
+## Why Move the Smaller Side?
+
+This is the key Two Pointers idea.
+
+If:
+
+```text
+height[left] < height[right]
+```
+
+the left side is the limiting boundary. The right side is already tall enough, so we can safely calculate water for the left position using `leftMax` and move `left`.
+
+If:
+
+```text
+height[right] <= height[left]
+```
+
+do the same thing from the right using `rightMax` and move `right`.
+
+## Compare With Container With Most Water
+
+### Container With Most Water
+
+```text
+area = width × min(leftHeight, rightHeight)
+```
+
+Move the shorter pointer.
+
+### Trapping Rain Water
+
+```text
+water = min(leftMax, rightMax) - currentHeight
+```
+
+Track the maximum wall from both sides and process the smaller current side.
 
 ## Complexity
 
@@ -142,11 +273,15 @@ If the right height is smaller or equal, process the right side using `rightMax`
 ## Memory Trick
 
 ```text
+Trapping Rain Water
+
 Two Pointers
-      +
-leftMax and rightMax
       ↓
-Process the smaller side
+leftMax + rightMax
       ↓
-Add trapped water
+smaller side is processed
+      ↓
+maximum boundary - current height
+      ↓
+add water
 ```
